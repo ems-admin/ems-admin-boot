@@ -3,7 +3,6 @@ package com.ems.config.filter;
 import com.ems.common.constant.SecurityConstants;
 import com.ems.common.exception.BadRequestException;
 import com.ems.common.utils.JwtUtil;
-import com.sun.istack.internal.NotNull;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.authentication.AuthenticationManager;
