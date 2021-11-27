@@ -7,8 +7,7 @@ JWT、Vue3.0、Layui2.6.8开发，
 只提供最基础的登录、权限管理功能与日志功能，所有的业务功能，
 都可以根据自己的需要在此之上构建。
 
-ems-admin-boot是ems-admin后台的SpringBoot版本，与之对应的会有两套前端，
-一套基于Layui，另一套则是基于element-plus(后期提供)，大家可以根据自己的需求选择。
+ems-admin-boot是ems-admin后台的SpringBoot版本，与之对应的会有两套前端基于Layui开发
 
 
 [![AUR](https://img.shields.io/badge/license-Apache%20License%202.0-blue.svg)](https://github.com/ems-admin/ems-admin-boot/blob/master/LICENSE)
