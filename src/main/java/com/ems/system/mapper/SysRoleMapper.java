@@ -17,9 +17,11 @@ import java.util.List;
 public interface SysRoleMapper extends BaseMapper<SysRole> {
 
     /**
-     * 通过用户ID获取当前用户角色
-     * @param userId
-     * @return
-     */
+    * @Description: 通过用户ID获取当前用户角色
+    * @Param: [userId]
+    * @return: java.util.List<com.ems.system.entity.SysRole>
+    * @Author: starao
+    * @Date: 2021/11/29
+    */
     List<SysRole> getRoleByUserId(@Param("userId") Long userId);
 }
