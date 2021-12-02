@@ -15,6 +15,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
 import org.springframework.security.core.Authentication;
+import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -81,6 +82,9 @@ public class LoginController extends ResultUtil {
         } catch (BadRequestException e) {
             e.printStackTrace();
             return fail(false, e.getMsg());
+        } catch (Exception e){
+            e.printStackTrace();
+            return fail(false, e.getMessage());
         }
     }
 
