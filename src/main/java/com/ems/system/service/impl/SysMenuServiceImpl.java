@@ -217,7 +217,7 @@ public class SysMenuServiceImpl implements SysMenuService {
     private JSONArray getObjects(List<SysMenu> menuListAll, Long id, String title, List<String> menuIds) {
         try {
             //  获取子菜单
-            List<SysMenu> childList = menuListAll.stream().filter(menu -> menu.getParentId().equals(id)).collect(Collectors.toList());
+            List<SysMenu> childList = menuListAll.stream().filter(menu -> menu.getParentId().longValue() == id.longValue() ).collect(Collectors.toList());
             //  组装树
             JSONArray jsonArray = new JSONArray();
             childList.forEach(menu -> {
@@ -230,14 +230,14 @@ public class SysMenuServiceImpl implements SysMenuService {
                     jsonObject.put("name", menu.getName());
                     jsonObject.put("type", menu.getType());
                     jsonObject.put("component", menu.getComponent());
-                    if (!CollectionUtils.isEmpty(menuIds) && menuIds.contains(menu.getId())){
+                    if (!CollectionUtils.isEmpty(menuIds) && menuIds.contains(menu.getId().toString())){
                         jsonObject.put("checked", true);
                     }
                 } else if ("name".equals(title)){
                     jsonObject.put("open", false);
                     jsonObject.put("checked", false);
                 }
-                if (menuListAll.stream().anyMatch(menu1 -> menu1.getParentId().equals(id))) {
+                if (menuListAll.stream().anyMatch(menu1 -> menu1.getParentId().longValue() == id.longValue())) {
                     jsonObject.put("children", getChildMenu(menuListAll, menu.getId(), title, menuIds));
                 }
                 jsonArray.add(jsonObject);

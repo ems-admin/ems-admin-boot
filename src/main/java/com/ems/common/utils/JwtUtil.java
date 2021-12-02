@@ -3,8 +3,10 @@ package com.ems.common.utils;
 import com.ems.common.constant.SecurityConstants;
 import com.ems.common.exception.BadRequestException;
 import io.jsonwebtoken.*;
+import io.jsonwebtoken.security.InvalidKeyException;
 import io.jsonwebtoken.security.Keys;
 import io.jsonwebtoken.security.SignatureException;
+import lombok.extern.slf4j.Slf4j;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
@@ -25,9 +27,8 @@ import java.util.stream.Collectors;
  * @author: starao
  * @create: 2021-11-27 12:47
  **/
+@Slf4j
 public class JwtUtil {
-
-    private static final Logger logger = LoggerFactory.getLogger(JwtUtil.class);
 
     private static final byte[] secretKey = DatatypeConverter.parseBase64Binary(SecurityConstants.JWT_SECRET_KEY);
 
@@ -43,27 +44,31 @@ public class JwtUtil {
     * @Date: 2021/11/27
     */
     public static String generateToken(String userName, List<String> roles, Boolean isRemember){
-        byte[] jwtSecretKey = secretKey;
-        //  过期时间
-        long expirationTime = isRemember ? SecurityConstants.TOKEN_EXPIRATION_REMEMBER_TIME : SecurityConstants.TOKEN_EXPIRATION_TIME;
+        try {
+            //  过期时间
+            long expirationTime = isRemember ? SecurityConstants.TOKEN_EXPIRATION_REMEMBER_TIME : SecurityConstants.TOKEN_EXPIRATION_TIME;
 
-        //  生成token
-        return Jwts.builder()
-                //  生成签证信息
-                .setHeaderParam("typ", SecurityConstants.TOKEN_TYPE)
-                .signWith(Keys.hmacShaKeyFor(jwtSecretKey))
-                //  所有人
-                .setSubject(userName)
-                //  角色
-                .claim(SecurityConstants.TOKEN_ROLE_CLAIM, roles)
-                //  JWT主体
-                .setIssuer(SecurityConstants.TOKEN_ISSUER)
-                //  签发时间
-                .setIssuedAt(new Date())
-                .setAudience(SecurityConstants.TOKEN_AUDIENCE)
-                //  设置有效时间
-                .setExpiration(new Date(System.currentTimeMillis() + expirationTime * 1000))
-                .compact();
+            //  生成token
+            return Jwts.builder()
+                    //  生成签证信息
+                    .setHeaderParam("typ", SecurityConstants.TOKEN_TYPE)
+                    .signWith(Keys.hmacShaKeyFor(secretKey))
+                    //  所有人
+                    .setSubject(userName)
+                    //  角色
+                    .claim(SecurityConstants.TOKEN_ROLE_CLAIM, roles)
+                    //  JWT主体
+                    .setIssuer(SecurityConstants.TOKEN_ISSUER)
+                    //  签发时间
+                    .setIssuedAt(new Date())
+                    .setAudience(SecurityConstants.TOKEN_AUDIENCE)
+                    //  设置有效时间
+                    .setExpiration(new Date(System.currentTimeMillis() + expirationTime * 1000))
+                    .compact();
+        } catch (InvalidKeyException e) {
+            e.printStackTrace();
+            throw new BadRequestException(e.getMessage());
+        }
     }
 
     /**
@@ -78,19 +83,19 @@ public class JwtUtil {
             getTokenBody(token);
             return true;
         } catch (ExpiredJwtException e) {
-            logger.warn("token 已过期 : {} failed : {}", token, e.getMessage());
+            log.warn("token 已过期 : {} failed : {}", token, e.getMessage());
             throw new BadRequestException(e.getMessage());
         } catch (UnsupportedJwtException e) {
-            logger.warn("token 不支持 : {} failed : {}", token, e.getMessage());
+            log.warn("token 不支持 : {} failed : {}", token, e.getMessage());
             throw new BadRequestException(e.getMessage());
         } catch (MalformedJwtException e) {
-            logger.warn("token 格式不正确 : {} failed : {}", token, e.getMessage());
+            log.warn("token 格式不正确 : {} failed : {}", token, e.getMessage());
             throw new BadRequestException(e.getMessage());
         } catch (SignatureException e) {
-            logger.warn("token 签名无效 : {} failed : {}", token, e.getMessage());
+            log.warn("token 签名无效 : {} failed : {}", token, e.getMessage());
             throw new BadRequestException(e.getMessage());
         } catch (IllegalArgumentException e) {
-            logger.warn("token 不能为空 : {} failed : {}", token, e.getMessage());
+            log.warn("token 不能为空 : {} failed : {}", token, e.getMessage());
             throw new BadRequestException(e.getMessage());
         }
     }
