@@ -101,6 +101,12 @@
             <artifactId>problem-spring-web-starter</artifactId>
             <version>${problem-version}</version>
         </dependency>
+        <!--兼容jdk11-->
+        <dependency>
+            <groupId>jakarta.xml.bind</groupId>
+            <artifactId>jakarta.xml.bind-api</artifactId>
+            <version>2.3.3</version>
+        </dependency>
     </dependencies>
 
     <build>
