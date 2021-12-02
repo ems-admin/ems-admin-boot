@@ -5,14 +5,14 @@ spring:
   #mysql
   datasource:
     driver-class-name: com.mysql.cj.jdbc.Driver
-    url: jdbc:mysql://140.82.113.4:3306/ems-admin?characterEncoding=utf8&useSSL=false&serverTimezone=UTC&rewriteBatchedStatements=true
+    url: jdbc:mysql://localhost:3306/ems-admin?characterEncoding=utf8&useSSL=false&serverTimezone=UTC&rewriteBatchedStatements=true
     username: root
-    password: 123456
+    password: 12345678
     hikari:
       connection-timeout: 5000
       maximum-pool-size: 10
       idle-timeout: 3000
-      max-lifetime: 15000
+      max-lifetime: 50000
 
   # 请求超时时间
   mvc:
