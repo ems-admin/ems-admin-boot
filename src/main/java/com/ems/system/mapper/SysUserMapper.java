@@ -6,6 +6,8 @@ import com.ems.system.entity.dto.UserDto;
 import org.apache.ibatis.annotations.Param;
 import org.springframework.stereotype.Repository;
 
+import java.util.List;
+
 /**
  * @program: ems-admin-boot
  * @description: this is a interface
@@ -23,4 +25,13 @@ public interface SysUserMapper extends BaseMapper<SysUser> {
     * @Date: 2021/11/27
     */
     UserDto loadByName(@Param("username") String username);
+
+    /**
+    * @Description: 查询用户列表
+    * @Param: [blurry]
+    * @return: java.util.List<com.ems.system.entity.dto.UserDto>
+    * @Author: starao
+    * @Date: 2021/12/4
+    */
+    List<UserDto> queryUserTable(@Param("blurry") String blurry);
 }

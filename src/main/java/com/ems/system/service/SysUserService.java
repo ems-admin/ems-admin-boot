@@ -38,7 +38,7 @@ public interface SysUserService {
     * @Author: starao
     * @Date: 2021/11/27
     */
-    List<SysUser> queryUserTable(String blurry);
+    List<UserDto> queryUserTable(String blurry);
 
     /**
     * @Description: 根据用户名查询用户

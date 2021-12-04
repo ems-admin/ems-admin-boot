@@ -132,7 +132,7 @@ public class SysMenuController extends ResultUtil {
             return success(true, "删除成功");
         } catch (BadRequestException e) {
             e.printStackTrace();
-            return fail(false, "删除失败");
+            return fail(false, e.getMsg());
         }
     }
 

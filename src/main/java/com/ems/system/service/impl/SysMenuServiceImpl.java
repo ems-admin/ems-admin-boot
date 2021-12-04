@@ -7,8 +7,11 @@ import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.ems.common.constant.CommonConstants;
 import com.ems.common.exception.BadRequestException;
 import com.ems.system.entity.SysMenu;
+import com.ems.system.entity.SysRoleMenu;
 import com.ems.system.mapper.SysMenuMapper;
+import com.ems.system.mapper.SysRoleMenuMapper;
 import com.ems.system.service.SysMenuService;
+import com.ems.system.service.SysRoleMenuService;
 import lombok.RequiredArgsConstructor;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.stereotype.Service;
@@ -29,6 +32,8 @@ import java.util.stream.Collectors;
 public class SysMenuServiceImpl implements SysMenuService {
 
     private final SysMenuMapper menuMapper;
+
+    private final SysRoleMenuMapper roleMenuMapper;
 
     /**
      * @param roles
@@ -141,6 +146,8 @@ public class SysMenuServiceImpl implements SysMenuService {
     @Override
     public void delMenu(Long id) {
         try {
+            //  校验菜单是否已绑定角色
+            checkMenuRole(id);
             menuMapper.deleteById(id);
         } catch (BadRequestException e) {
             e.printStackTrace();
@@ -243,6 +250,27 @@ public class SysMenuServiceImpl implements SysMenuService {
                 jsonArray.add(jsonObject);
             });
             return jsonArray;
+        } catch (BadRequestException e) {
+            e.printStackTrace();
+            throw new BadRequestException(e.getMsg());
+        }
+    }
+
+    /**
+    * @Description: 校验菜单是否已绑定角色
+    * @Param: [menuId]
+    * @return: void
+    * @Author: starao
+    * @Date: 2021/12/4
+    */
+    private void checkMenuRole(Long menuId){
+        try {
+            LambdaQueryWrapper<SysRoleMenu> wrapper = new LambdaQueryWrapper<>();
+            wrapper.eq(SysRoleMenu::getMenuId, menuId);
+            long count = roleMenuMapper.selectCount(wrapper);
+            if (count > 0){
+                throw new BadRequestException("该菜单已绑定角色，无法删除");
+            }
         } catch (BadRequestException e) {
             e.printStackTrace();
             throw new BadRequestException(e.getMsg());

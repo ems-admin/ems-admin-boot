@@ -19,7 +19,7 @@ public class BadRequestException extends RuntimeException{
      */
     private Integer status = BAD_REQUEST.value();
 
-    private String msg;
+    private final String msg;
 
     public BadRequestException(String msg){
         this.msg = msg;
