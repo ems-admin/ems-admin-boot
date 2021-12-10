@@ -6,6 +6,7 @@ import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.ems.common.constant.CommonConstants;
 import com.ems.common.exception.BadRequestException;
+import com.ems.common.utils.StringUtil;
 import com.ems.system.entity.SysMenu;
 import com.ems.system.entity.SysRoleMenu;
 import com.ems.system.mapper.SysMenuMapper;
@@ -192,6 +193,31 @@ public class SysMenuServiceImpl implements SysMenuService {
                 return menuMapper.selectList(null);
             }
             return menuMapper.getMenuTree(roles);
+        } catch (BadRequestException e) {
+            e.printStackTrace();
+            throw new BadRequestException(e.getMsg());
+        }
+    }
+
+    /**
+     * @param blurry
+     * @Description: 获取菜单列表
+     * @Param: [blurry]
+     * @return: com.alibaba.fastjson.JSONArray
+     * @Author: starao
+     * @Date: 2021/12/11
+     */
+    @Override
+    public JSONArray getMenuTable(String blurry) {
+        try {
+            LambdaQueryWrapper<SysMenu> wrapper = new LambdaQueryWrapper<>();
+            if (StringUtil.isNotBlank(blurry)){
+                wrapper.like(SysMenu::getName, blurry);
+                wrapper.or();
+                wrapper.like(SysMenu::getPath, blurry);
+            }
+            List<SysMenu> list = menuMapper.selectList(wrapper);
+            return getObjects(list, 0l, "title", null);
         } catch (BadRequestException e) {
             e.printStackTrace();
             throw new BadRequestException(e.getMsg());

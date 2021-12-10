@@ -109,7 +109,7 @@ public class SysLogServiceImpl implements SysLogService {
                 wrapper.like(SysLog::getDescription, logDto.getDescription());
             }
             if (StringUtil.isNotBlank(logDto.getLogType())){
-                wrapper.ne(SysLog::getLogType, logDto.getLogType());
+                wrapper.eq(SysLog::getLogType, logDto.getLogType());
             }
             Page<SysLog> page = new Page<>();
             page.setSize(logDto.getSize());

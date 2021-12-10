@@ -75,4 +75,13 @@ public interface SysMenuService {
     * @Date: 2021/11/27
     */
     List<SysMenu> queryAllMenus(List<String> roles);
+
+    /**
+    * @Description: 获取菜单列表
+    * @Param: [blurry]
+    * @return: com.alibaba.fastjson.JSONArray
+    * @Author: starao
+    * @Date: 2021/12/11
+    */
+    JSONArray getMenuTable(String blurry);
 }

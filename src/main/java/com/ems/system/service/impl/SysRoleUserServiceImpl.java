@@ -8,6 +8,7 @@ import com.ems.system.mapper.SysRoleUserMapper;
 import com.ems.system.service.SysRoleUserService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 
@@ -53,6 +54,7 @@ public class SysRoleUserServiceImpl implements SysRoleUserService {
      * @Date: 2021/11/27
      */
     @Override
+    @Transactional
     public void edit(Long userId, List<String> roles) {
         try {
             //  首先清空该用户所有角色
