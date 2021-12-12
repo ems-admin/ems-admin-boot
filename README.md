@@ -3,11 +3,12 @@
 #### 介绍
 ems-admin(easy manage system)是一套极简的后台管理系统，
 基于SpringBoot2.5.2、SpringSecurity、Mybatis-plus3.4.3.4、Mysql8.0、
-JWT、Vue3.0、Layui2.6.8开发，
+JWT、Vue3.0、Layui2.6.8（或element-plus）开发，
 只提供最基础的登录、权限管理功能与日志功能，所有的业务功能，
 都可以根据自己的需要在此之上构建。
 
-ems-admin-boot是ems-admin后台的SpringBoot版本，前端为基于Layui开发ems-admin-layui
+ems-admin-boot是ems-admin后台的SpringBoot版本，
+前端分为基于Layui开发ems-admin-layui和基于element-plus开发的ems-admin-element-plus
 
 
 [![AUR](https://img.shields.io/badge/license-Apache%20License%202.0-blue.svg)](https://github.com/ems-admin/ems-admin-boot/blob/master/LICENSE)
@@ -16,6 +17,8 @@ ems-admin-boot是ems-admin后台的SpringBoot版本，前端为基于Layui开发
 [![GitHub forks](https://img.shields.io/github/forks/ems-admin/ems-admin-boot.svg?style=social&label=Fork)](https://github.com/ems-admin/ems-admin-boot)
 
 [ems-admin-layui演示站点](http://ems-admin-layui.facebook47.cn/)
+
+[ems-admin-element-plus演示站点](http://ems-admin-element.facebook47.cn/)
 
 #### 支持功能
 
