@@ -2,9 +2,12 @@ package com.ems.system.service.impl;
 
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
+import com.ems.common.constant.CommonConstants;
 import com.ems.common.exception.BadRequestException;
+import com.ems.system.entity.SysRole;
 import com.ems.system.entity.SysRoleMenu;
 import com.ems.system.entity.dto.RoleMenuDto;
+import com.ems.system.mapper.SysRoleMapper;
 import com.ems.system.mapper.SysRoleMenuMapper;
 import com.ems.system.service.SysRoleMenuService;
 import lombok.RequiredArgsConstructor;
@@ -25,6 +28,8 @@ import java.util.List;
 public class SysRoleMenuServiceImpl implements SysRoleMenuService {
 
     private final SysRoleMenuMapper roleMenuMapper;
+
+    private final SysRoleMapper roleMapper;
 
     /**
      * @param roleId
@@ -59,6 +64,11 @@ public class SysRoleMenuServiceImpl implements SysRoleMenuService {
     public void editMenuRoleByRoleId(RoleMenuDto roleMenuDto) {
         try {
             Long roleId = roleMenuDto.getRoleId();
+            //  获取当前角色信息
+            SysRole role = roleMapper.selectById(roleId);
+            if (CommonConstants.ROLE_ADMIN.equals(role.getRoleCode())){
+                throw new BadRequestException("超级管理员拥有所有权限，无需授权");
+            }
             //  1先清空之前角色的所有菜单
             deleteByRoleId(roleId);
             //  2遍历所有的菜单
