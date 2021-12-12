@@ -105,7 +105,9 @@ public class SysMenuServiceImpl implements SysMenuService {
             jsonObject.put("name", "顶级目录");
             jsonObject.put("open", true);
             jsonObject.put("checked", false);
-            jsonObject.put("children", getObjects(menuList, 0l,  "name", null));
+            if (!getObjects(menuList, 0l,  "name", null).isEmpty()){
+                jsonObject.put("children", getObjects(menuList, 0l,  "name", null));
+            }
             jsonArray.add(0, jsonObject);
             return jsonArray;
         } catch (BadRequestException e) {
@@ -262,6 +264,7 @@ public class SysMenuServiceImpl implements SysMenuService {
                     jsonObject.put("path", menu.getPath());
                     jsonObject.put("name", menu.getName());
                     jsonObject.put("type", menu.getType());
+                    jsonObject.put("sort", menu.getSort());
                     jsonObject.put("component", menu.getComponent());
                     if (!CollectionUtils.isEmpty(menuIds) && menuIds.contains(menu.getId().toString())){
                         jsonObject.put("checked", true);
@@ -271,7 +274,9 @@ public class SysMenuServiceImpl implements SysMenuService {
                     jsonObject.put("checked", false);
                 }
                 if (menuListAll.stream().anyMatch(menu1 -> menu1.getParentId().longValue() == id.longValue())) {
-                    jsonObject.put("children", getChildMenu(menuListAll, menu.getId(), title, menuIds));
+                    if (!getChildMenu(menuListAll, menu.getId(), title, menuIds).isEmpty()){
+                        jsonObject.put("children", getChildMenu(menuListAll, menu.getId(), title, menuIds));
+                    }
                 }
                 jsonArray.add(jsonObject);
             });
