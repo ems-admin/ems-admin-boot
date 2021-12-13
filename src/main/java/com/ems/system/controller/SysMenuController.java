@@ -63,24 +63,6 @@ public class SysMenuController extends ResultUtil {
     }
 
     /**
-    * @Description: 获取菜单table树
-    * @Param: [blurry]
-    * @return: org.springframework.http.ResponseEntity<java.lang.Object>
-    * @Author: starao
-    * @Date: 2021/11/27
-    */
-    @Log("获取菜单的table树")
-    @GetMapping("/menu/table/tree")
-    public ResponseEntity<Object> getMenuTableTree(String blurry){
-        try {
-            return success(true, menuService.getMenuTableTree(blurry));
-        } catch (BadRequestException e) {
-            e.printStackTrace();
-            return fail(false, e.getMsg());
-        }
-    }
-
-    /**
     * @Description: 获取菜单列表
     * @Param: [blurry]
     * @return: org.springframework.http.ResponseEntity<java.lang.Object>

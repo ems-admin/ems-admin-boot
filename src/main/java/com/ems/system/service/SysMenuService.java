@@ -23,15 +23,6 @@ public interface SysMenuService {
     JSONArray getMenuTree(List<String> roles);
 
     /**
-    * @Description: 获取菜单table树
-    * @Param: [blurry]
-    * @return: java.util.List<com.ems.system.entity.SysMenu>
-    * @Author: starao
-    * @Date: 2021/11/27
-    */
-    List<SysMenu> getMenuTableTree(String blurry);
-
-    /**
     * @Description: 获取下拉框里面的树
     * @Param: [type]
     * @return: com.alibaba.fastjson.JSONArray

@@ -62,28 +62,6 @@ public class SysMenuServiceImpl implements SysMenuService {
     }
 
     /**
-     * @param blurry
-     * @Description: 获取菜单table树
-     * @Param: [blurry]
-     * @return: java.util.List<com.ems.system.entity.SysMenu>
-     * @Author: starao
-     * @Date: 2021/11/27
-     */
-    @Override
-    public List<SysMenu> getMenuTableTree(String blurry) {
-        try {
-            LambdaQueryWrapper<SysMenu> wrapper = new LambdaQueryWrapper<>();
-            if (StringUtils.isNotBlank(blurry)){
-                wrapper.like(SysMenu::getName, blurry);
-            }
-            return menuMapper.selectList(wrapper);
-        } catch (BadRequestException e) {
-            e.printStackTrace();
-            throw new BadRequestException(e.getMsg());
-        }
-    }
-
-    /**
      * @param type
      * @Description: 获取下拉框里面的树
      * @Param: [type]
