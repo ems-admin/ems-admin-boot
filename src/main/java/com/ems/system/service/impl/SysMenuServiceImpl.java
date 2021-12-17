@@ -18,8 +18,7 @@ import org.apache.commons.lang3.StringUtils;
 import org.springframework.stereotype.Service;
 import org.springframework.util.CollectionUtils;
 
-import java.util.ArrayList;
-import java.util.List;
+import java.util.*;
 import java.util.stream.Collectors;
 
 /**
@@ -53,6 +52,13 @@ public class SysMenuServiceImpl implements SysMenuService {
                 menuListAll = menuMapper.selectList(null);
             } else {
                 menuListAll = menuMapper.getMenuTree(roles);
+                if (!CollectionUtils.isEmpty(menuListAll)){
+                    Set<SysMenu> menuSet = new HashSet<>();
+                    for (SysMenu sysMenu : menuListAll) {
+                        menuSet.addAll(getAllMenusByChildId(sysMenu.getId()));
+                    }
+                    menuListAll = new ArrayList<>(menuSet).stream().sorted(Comparator.comparing(SysMenu::getId)).collect(Collectors.toList());
+                }
             }
             return getObjects(menuListAll, 0l, "title", null);
         } catch (BadRequestException e) {
@@ -280,6 +286,22 @@ public class SysMenuServiceImpl implements SysMenuService {
             if (count > 0){
                 throw new BadRequestException("该菜单已绑定角色，无法删除");
             }
+        } catch (BadRequestException e) {
+            e.printStackTrace();
+            throw new BadRequestException(e.getMsg());
+        }
+    }
+
+    /**
+    * @Description: 通过菜单Id获取所有上级菜单
+    * @Param: [menuId]
+    * @return: java.util.List<com.ems.system.entity.SysMenu>
+    * @Author: starao
+    * @Date: 2021/12/17
+    */
+    private List<SysMenu> getAllMenusByChildId(Long menuId){
+        try {
+            return menuMapper.getAllMenusByChildId(menuId);
         } catch (BadRequestException e) {
             e.printStackTrace();
             throw new BadRequestException(e.getMsg());

@@ -7,6 +7,7 @@ import com.ems.system.entity.SysRole;
 import com.ems.system.service.SysRoleService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 /**
@@ -49,6 +50,7 @@ public class SysRoleController extends ResultUtil {
     */
     @Log("编辑角色")
     @PostMapping("/role/edit")
+    @PreAuthorize("hasRole('ROLE_ADMIN')")
     public ResponseEntity<Object> editRole(@RequestBody SysRole role){
         String tag = role.getId() == null ? "添加成功" : "修改成功";
         try {

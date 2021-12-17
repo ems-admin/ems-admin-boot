@@ -28,4 +28,6 @@ public class UserDto {
     private List<String> roles;
 
     private Boolean enabled;
+
+    private List<Long> roleIds;
 }

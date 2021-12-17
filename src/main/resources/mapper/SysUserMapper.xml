@@ -5,6 +5,9 @@
   <resultMap id="roles" type="java.lang.String">
       <result column="roles" property="roles" jdbcType="VARCHAR"></result>
   </resultMap>
+    <resultMap id="roleIds" type="java.lang.Long">
+      <result column="roleIds" property="roleIds" jdbcType="BIGINT"></result>
+  </resultMap>
 
   <resultMap id="userResult" type="com.ems.system.entity.dto.UserDto">
       <result column="id" property="id" jdbcType="BIGINT"></result>
@@ -14,6 +17,7 @@
       <result column="nickName" property="nickName" jdbcType="VARCHAR"></result>
       <result column="enabled" property="enabled" jdbcType="BOOLEAN"></result>
       <association property="roles" resultMap="roles"></association>
+      <association property="roleIds" resultMap="roleIds"></association>
   </resultMap>
 
     <select id="loadByName" resultType="com.ems.system.entity.dto.UserDto">
@@ -32,7 +36,8 @@
             t1.enabled,
             t1.nick_name AS nickName,
             t1.username,
-            GROUP_CONCAT( t3.role_code SEPARATOR ',' ) AS roles
+            GROUP_CONCAT( t3.role_code SEPARATOR ',' ) AS roles,
+            GROUP_CONCAT( t3.id SEPARATOR ',' ) AS roleIds
         FROM
             sys_user t1
                 LEFT JOIN sys_role_user t2 ON t1.id = t2.user_id
