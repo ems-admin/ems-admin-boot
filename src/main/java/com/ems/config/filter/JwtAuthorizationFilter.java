@@ -35,7 +35,8 @@ public class JwtAuthorizationFilter extends BasicAuthenticationFilter {
     * @Date: 2021/11/27
     */
     @Override
-    protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain) throws ServletException, IOException {
+    protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response,
+                                    FilterChain filterChain) throws ServletException, IOException {
         try {
             //  从request中获取token
             String token = this.getTokenFromHttpServletRequest(request);

@@ -250,6 +250,7 @@ public class SysMenuServiceImpl implements SysMenuService {
                     jsonObject.put("type", menu.getType());
                     jsonObject.put("sort", menu.getSort());
                     jsonObject.put("component", menu.getComponent());
+                    jsonObject.put("permission", menu.getPermission());
                     if (!CollectionUtils.isEmpty(menuIds) && menuIds.contains(menu.getId().toString())){
                         jsonObject.put("checked", true);
                     }

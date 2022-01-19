@@ -36,4 +36,6 @@ public class SysMenu extends BaseEntity {
     private String type;
 
     private String component;
+
+    private String permission;
 }

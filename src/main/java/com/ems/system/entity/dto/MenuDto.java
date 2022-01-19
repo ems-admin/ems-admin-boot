@@ -24,4 +24,6 @@ public class MenuDto {
     private int sort;
 
     private String type;
+
+    private String permission;
 }
