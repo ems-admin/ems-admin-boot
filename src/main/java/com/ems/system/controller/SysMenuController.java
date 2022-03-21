@@ -45,6 +45,25 @@ public class SysMenuController extends ResultUtil {
     }
 
     /**
+    * @Description: 获取左侧菜单树
+    * @Param: []
+    * @return: org.springframework.http.ResponseEntity<java.lang.Object>
+    * @Author: starao
+    * @Date: 2022/3/20
+    */
+    @Log("获取左侧菜单树")
+    @GetMapping("/menu/tree/left")
+    public ResponseEntity<Object> getMenuTreeForLeft(){
+        try {
+            List<String> roles = SecurityUtil.getCurrentRoles();
+            return success(true, menuService.getMenuTreeForLeft(roles));
+        } catch (BadRequestException e) {
+            e.printStackTrace();
+            return fail(false, e.getMsg());
+        }
+    }
+
+    /**
     * @Description: 查询当前用户所有权限菜单
     * @Param: []
     * @return: org.springframework.http.ResponseEntity<java.lang.Object>

@@ -202,12 +202,71 @@ public class SysMenuServiceImpl implements SysMenuService {
                 wrapper.or();
                 wrapper.like(SysMenu::getPath, blurry);
             }
+            wrapper.orderByAsc(SysMenu::getSort);
             List<SysMenu> list = menuMapper.selectList(wrapper);
             return getObjects(list, 0l, "title", null);
         } catch (BadRequestException e) {
             e.printStackTrace();
             throw new BadRequestException(e.getMsg());
         }
+    }
+
+    /**
+     * @param roles
+     * @Description: 通过角色获取所有授权菜单
+     * @Param: [currentRoles]
+     * @return: java.util.List<java.lang.String>
+     * @Author: starao
+     * @Date: 2022/1/19
+     */
+    @Override
+    public List<String> getUrlsByRoles(List<String> roles) {
+        try {
+            return menuMapper.getMenuUrlByRole(roles);
+        } catch (BadRequestException e) {
+            e.printStackTrace();
+            throw new BadRequestException(e.getMsg());
+        }
+    }
+
+    /**
+     * @param roles
+     * @Description: 获取左侧菜单树
+     * @Param: [roles]
+     * @return: com.alibaba.fastjson.JSONArray
+     * @Author: starao
+     * @Date: 2022/3/20
+     */
+    @Override
+    public JSONArray getMenuTreeForLeft(List<String> roles) {
+        //  如果是系统管理员，则直接获取所有菜单
+        List<SysMenu> menuList = new ArrayList<>();
+        if (roles.contains(CommonConstants.ROLE_ADMIN)){
+            LambdaQueryWrapper<SysMenu> wrapper = new LambdaQueryWrapper<>();
+            //  菜单
+            wrapper.eq(SysMenu::getType, "1");
+            wrapper.or();
+            //  页面
+            wrapper.eq(SysMenu::getType, "2");
+            wrapper.orderByAsc(SysMenu::getSort);
+            menuList = menuMapper.selectList(wrapper);
+        }
+        JSONArray jsonArray = new JSONArray();
+        if (!CollectionUtils.isEmpty(menuList)){
+            List<SysMenu> topMenuList = menuList.stream().filter(sysMenu -> sysMenu.getParentId() == 0L).collect(Collectors.toList());
+            for (SysMenu sysMenu : topMenuList) {
+                JSONObject jsonObject = new JSONObject();
+                jsonObject.put("id", sysMenu.getId());
+                jsonObject.put("path", sysMenu.getPath());
+                jsonObject.put("name", sysMenu.getName());
+                jsonObject.put("type", sysMenu.getType());
+                if (!CollectionUtils.isEmpty(getChildMenu(menuList, sysMenu.getId(), "left", null))){
+                    jsonObject.put("children", getChildMenu(menuList, sysMenu.getId(), "left", null));
+                }
+                jsonArray.add(jsonObject);
+            }
+        }
+        return jsonArray;
     }
 
     /**
@@ -235,8 +294,9 @@ public class SysMenuServiceImpl implements SysMenuService {
     */
     private JSONArray getObjects(List<SysMenu> menuListAll, Long id, String title, List<String> menuIds) {
         try {
-            //  获取子菜单
-            List<SysMenu> childList = menuListAll.stream().filter(menu -> menu.getParentId().longValue() == id.longValue() ).collect(Collectors.toList());
+            //  获取子菜单(不包含按钮)
+            List<SysMenu> childList = menuListAll.stream().filter(menu ->
+                    menu.getParentId().longValue() == id.longValue() && !"3".equals(menu.getType())).collect(Collectors.toList());
             //  组装树
             JSONArray jsonArray = new JSONArray();
             childList.forEach(menu -> {
@@ -257,6 +317,10 @@ public class SysMenuServiceImpl implements SysMenuService {
                 } else if ("name".equals(title)){
                     jsonObject.put("open", false);
                     jsonObject.put("checked", false);
+                } else if ("left".equals(title)){
+                    jsonObject.put("name", menu.getName());
+                    jsonObject.put("path", menu.getPath());
+                    jsonObject.put("type", menu.getType());
                 }
                 if (menuListAll.stream().anyMatch(menu1 -> menu1.getParentId().longValue() == id.longValue())) {
                     if (!getChildMenu(menuListAll, menu.getId(), title, menuIds).isEmpty()){

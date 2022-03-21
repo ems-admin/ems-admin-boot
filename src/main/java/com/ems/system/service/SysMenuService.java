@@ -75,4 +75,22 @@ public interface SysMenuService {
     * @Date: 2021/12/11
     */
     JSONArray getMenuTable(String blurry);
+
+    /**
+    * @Description: 通过角色获取所有授权菜单
+    * @Param: [currentRoles]
+    * @return: java.util.List<java.lang.String>
+    * @Author: starao
+    * @Date: 2022/1/19
+    */
+    List<String> getUrlsByRoles(List<String> currentRoles);
+
+    /**
+    * @Description: 获取左侧菜单树
+    * @Param: [roles]
+    * @return: com.alibaba.fastjson.JSONArray
+    * @Author: starao
+    * @Date: 2022/3/20
+    */
+    JSONArray getMenuTreeForLeft(List<String> roles);
 }
