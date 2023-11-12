@@ -1,8 +1,9 @@
 package com.ems.system.service;
 
 import com.baomidou.mybatisplus.core.metadata.IPage;
+import com.baomidou.mybatisplus.extension.service.IService;
 import com.ems.system.entity.SysLog;
-import com.ems.system.entity.dto.LogDto;
+import com.ems.system.entity.dto.QueryDto;
 import org.aspectj.lang.ProceedingJoinPoint;
 
 /**
@@ -11,7 +12,7 @@ import org.aspectj.lang.ProceedingJoinPoint;
  * @author: starao
  * @create: 2021-11-27 14:23
  **/
-public interface SysLogService {
+public interface SysLogService extends IService<SysLog> {
 
     /**
     * @Description: 保存日志
@@ -24,10 +25,10 @@ public interface SysLogService {
 
     /**
     * @Description: 查询日志列表
-    * @Param: [logDto]
+    * @Param: [queryDto, logType]
     * @return: com.baomidou.mybatisplus.core.metadata.IPage<com.ems.system.entity.SysLog>
     * @Author: starao
     * @Date: 2021/11/27
     */
-    IPage<SysLog> getLogList(LogDto logDto);
+    IPage<SysLog> getLogList(QueryDto queryDto, String logType);
 }

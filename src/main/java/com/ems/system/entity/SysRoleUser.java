@@ -1,6 +1,7 @@
 package com.ems.system.entity;
 
 import com.baomidou.mybatisplus.annotation.IdType;
+import com.baomidou.mybatisplus.annotation.TableField;
 import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.TableName;
 import com.ems.common.utils.BaseEntity;
@@ -8,6 +9,10 @@ import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+
+import java.io.Serial;
+import java.io.Serializable;
+import java.util.Date;
 
 /**
  * @program: ems-admin-boot
@@ -20,12 +25,26 @@ import lombok.Setter;
 @NoArgsConstructor
 @AllArgsConstructor
 @TableName(value = "sys_role_user")
-public class SysRoleUser extends BaseEntity {
+public class SysRoleUser extends BaseEntity implements Serializable {
 
+    /**
+     * 主键
+     */
     @TableId(type = IdType.AUTO)
     private Long id;
 
+    /**
+     * 用户ID
+     */
     private Long userId;
 
+    /**
+     * 角色ID
+     */
     private Long roleId;
+
+    @Serial
+    @TableField(exist = false)
+    private static final long serialVersionUID = 1L;
+
 }

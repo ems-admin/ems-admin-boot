@@ -1,11 +1,17 @@
 package com.ems.system.service.impl;
 
+import com.alibaba.fastjson2.JSONObject;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
+import com.baomidou.mybatisplus.core.metadata.IPage;
+import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
+import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.ems.common.constant.CommonConstants;
 import com.ems.common.exception.BadRequestException;
+import com.ems.common.utils.SecurityUtil;
 import com.ems.common.utils.StringUtil;
 import com.ems.system.entity.SysUser;
+import com.ems.system.entity.dto.QueryDto;
 import com.ems.system.entity.dto.UserDto;
 import com.ems.system.mapper.SysUserMapper;
 import com.ems.system.service.SysRoleUserService;
@@ -26,7 +32,7 @@ import java.util.List;
  **/
 @Service
 @RequiredArgsConstructor
-public class SysUserServiceImpl implements SysUserService {
+public class SysUserServiceImpl extends ServiceImpl<SysUserMapper, SysUser> implements SysUserService {
 
     private final SysUserMapper sysUserMapper;
 
@@ -64,37 +70,32 @@ public class SysUserServiceImpl implements SysUserService {
      */
     @Override
     public void editUser(UserDto userDto) {
-        try {
-            checkUser(userDto);
-            SysUser user = new SysUser();
-            user.setPassword(userDto.getPassword());
-            user.setUsername(userDto.getUsername());
-            user.setEmail(userDto.getEmail());
-            user.setId(userDto.getId());
-            user.setNickName(userDto.getNickName());
-            if (userDto.getEnabled() != null){
-                user.setEnabled(userDto.getEnabled());
-            }
-            if (user.getId() != null){
-                sysUserMapper.updateById(user);
-            } else {
-                //  初始化用户密码.默认111111
-                user.setPassword(passwordEncoder.encode(CommonConstants.DEFAULT_PASSWORD));
-                sysUserMapper.insert(user);
-            }
+        checkUser(userDto);
+        SysUser user = new SysUser();
+        user.setPassword(userDto.getPassword());
+        user.setUsername(userDto.getUsername());
+        user.setEmail(userDto.getEmail());
+        user.setId(userDto.getId());
+        user.setNickName(userDto.getNickName());
+        if (userDto.getEnabled() != null){
+            user.setEnabled(userDto.getEnabled());
+        }
+        if (user.getId() != null){
+            sysUserMapper.updateById(user);
+        } else {
+            //  初始化用户密码.默认111111
+            user.setPassword(passwordEncoder.encode(CommonConstants.DEFAULT_PASSWORD));
+            sysUserMapper.insert(user);
+        }
 
-            //  如果带有角色,就修改角色
-            if (!CollectionUtils.isEmpty(userDto.getRoles()) && user.getId() != null){
-                roleUserService.edit(user.getId(), userDto.getRoles());
-            }
-        } catch (BadRequestException e) {
-            e.printStackTrace();
-            throw new BadRequestException(e.getMsg());
+        //  如果带有角色,就修改角色
+        if (!CollectionUtils.isEmpty(userDto.getRoleIds()) && user.getId() != null){
+            roleUserService.edit(user.getId(), userDto.getRoleIds());
         }
     }
 
     /**
-     * @param blurry
+     * @param queryDto
      * @Description: 查询用户列表
      * @Param: [blurry]
      * @return: java.util.List<com.ems.system.entity.SysUser>
@@ -102,13 +103,11 @@ public class SysUserServiceImpl implements SysUserService {
      * @Date: 2021/11/27
      */
     @Override
-    public List<UserDto> queryUserTable(String blurry) {
-        try {
-            return sysUserMapper.queryUserTable(blurry);
-        } catch (BadRequestException e) {
-            e.printStackTrace();
-            throw new BadRequestException(e.getMsg());
-        }
+    public IPage<UserDto> queryUserTable(QueryDto queryDto) {
+        Page<UserDto> page = new Page<>();
+        page.setCurrent(queryDto.getCurrentPage());
+        page.setSize(queryDto.getSize());
+        return sysUserMapper.queryUserTable(page, queryDto.getBlurry());
     }
 
     /**
@@ -121,12 +120,7 @@ public class SysUserServiceImpl implements SysUserService {
      */
     @Override
     public UserDto loadByName(String username) {
-        try {
-            return sysUserMapper.loadByName(username);
-        } catch (BadRequestException e) {
-            e.printStackTrace();
-            throw new BadRequestException(e.getMsg());
-        }
+        return sysUserMapper.loadByName(username);
     }
 
     /**
@@ -138,17 +132,12 @@ public class SysUserServiceImpl implements SysUserService {
      * @Date: 2021/11/27
      */
     @Override
-    @Transactional
+    @Transactional(rollbackFor = BadRequestException.class)
     public void delUser(String id) {
-        try {
-            //  先解除用户与角色的绑定
-            roleUserService.deleteByUserId(id);
-            //  再删除用户
-            sysUserMapper.deleteById(id);
-        } catch (BadRequestException e) {
-            e.printStackTrace();
-            throw new BadRequestException(e.getMsg());
-        }
+        //  先解除用户与角色的绑定
+        roleUserService.deleteByUserId(id);
+        //  再删除用户
+        sysUserMapper.deleteById(id);
     }
 
     /**
@@ -161,12 +150,37 @@ public class SysUserServiceImpl implements SysUserService {
      */
     @Override
     public void enabledUser(SysUser sysUser) {
-        try {
-            sysUserMapper.updateById(sysUser);
-        } catch (BadRequestException e) {
-            e.printStackTrace();
-            throw new BadRequestException(e.getMsg());
+        sysUserMapper.updateById(sysUser);
+    }
+
+    /**
+     * @param jsonObject
+     * @Description: 修改用户密码
+     * @Param: [jsonObject]
+     * @return: void
+     * @Author: starao
+     * @Date: 2022/10/6
+     */
+    @Override
+    public void updatePassword(JSONObject jsonObject) {
+        String password = jsonObject.getString("password");
+        String newPassword = jsonObject.getString("newPassword");
+        String confirmPassword = jsonObject.getString("confirmPassword");
+
+        //  获取当前登录用户
+        SysUser user = sysUserMapper.selectById(SecurityUtil.getCurrentUserId());
+        String pwd = user.getPassword();
+        //  校验原密码
+        if (!passwordEncoder.matches(password, pwd)){
+            throw new BadRequestException("原密码错误，请重新输入");
         }
+        //  校验新密码与确认密码
+        if (!newPassword.equals(confirmPassword)){
+            throw new BadRequestException("新密码与确认密码不相同，请重新输入");
+        }
+        //  修改密码为新密码
+        user.setPassword(passwordEncoder.encode(newPassword));
+        sysUserMapper.updateById(user);
     }
 
     /**

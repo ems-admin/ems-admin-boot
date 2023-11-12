@@ -4,6 +4,7 @@ import com.ems.common.utils.SpringContextHolder;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.context.annotation.Bean;
+import org.springframework.scheduling.annotation.EnableScheduling;
 import org.springframework.transaction.annotation.EnableTransactionManagement;
 
 /**
@@ -13,6 +14,7 @@ import org.springframework.transaction.annotation.EnableTransactionManagement;
  * @create: 2021-11-27 11:51
  **/
 @EnableTransactionManagement
+@EnableScheduling
 @SpringBootApplication
 public class RunApp {
 

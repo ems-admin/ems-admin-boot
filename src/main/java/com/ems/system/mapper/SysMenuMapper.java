@@ -35,20 +35,11 @@ public interface SysMenuMapper extends BaseMapper<SysMenu> {
     List<String> getMenuUrlByRole(@Param("roles") List<String> roles);
 
     /**
-    * @Description: 获取角色菜单树
-    * @Param: [roleId]
+    * @Description: 获取权限列表
+    * @Param: [roles]
     * @return: java.util.List<java.lang.String>
     * @Author: starao
-    * @Date: 2021/11/27
+    * @Date: 2022/10/6
     */
-    List<String> getMenuTreeByRoleId(@Param("roleId") String roleId);
-
-    /**
-    * @Description: 通过菜单Id获取所有上级菜单
-    * @Param: [menuId]
-    * @return: java.util.List<com.ems.system.entity.SysMenu>
-    * @Author: starao
-    * @Date: 2021/12/17
-    */
-    List<SysMenu> getAllMenusByChildId(@Param("menuId") Long menuId);
+    List<String> getPermission(@Param("roles") List<String> roles);
 }

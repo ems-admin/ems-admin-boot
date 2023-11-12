@@ -1,5 +1,6 @@
 package com.ems.system.service;
 
+import com.baomidou.mybatisplus.extension.service.IService;
 import com.ems.system.entity.SysRoleMenu;
 import com.ems.system.entity.dto.RoleMenuDto;
 
@@ -11,7 +12,7 @@ import java.util.List;
  * @author: starao
  * @create: 2021-11-27 14:26
  **/
-public interface SysRoleMenuService {
+public interface SysRoleMenuService extends IService<SysRoleMenu> {
 
     /**
     * @Description: 通过角色ID获取对应的菜单

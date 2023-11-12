@@ -2,6 +2,7 @@ package com.ems.system.service.impl;
 
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
+import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.ems.common.exception.BadRequestException;
 import com.ems.system.entity.SysRoleUser;
 import com.ems.system.mapper.SysRoleUserMapper;
@@ -20,7 +21,7 @@ import java.util.List;
  **/
 @Service
 @RequiredArgsConstructor
-public class SysRoleUserServiceImpl implements SysRoleUserService {
+public class SysRoleUserServiceImpl extends ServiceImpl<SysRoleUserMapper, SysRoleUser> implements SysRoleUserService {
 
     private final SysRoleUserMapper roleUserMapper;
 
@@ -34,19 +35,14 @@ public class SysRoleUserServiceImpl implements SysRoleUserService {
      */
     @Override
     public List<SysRoleUser> getRoleUserByRoleId(Long roleId) {
-        try {
-            QueryWrapper<SysRoleUser> wrapper = new QueryWrapper<>();
-            wrapper.eq("role_id", roleId);
-            return roleUserMapper.selectList(wrapper);
-        } catch (BadRequestException e) {
-            e.printStackTrace();
-            throw new BadRequestException(e.getMsg());
-        }
+        QueryWrapper<SysRoleUser> wrapper = new QueryWrapper<>();
+        wrapper.eq("role_id", roleId);
+        return roleUserMapper.selectList(wrapper);
     }
 
     /**
      * @param userId
-     * @param roles
+     * @param roleIds
      * @Description: 修改用户角色
      * @Param: [userId, roles]
      * @return: void
@@ -54,24 +50,19 @@ public class SysRoleUserServiceImpl implements SysRoleUserService {
      * @Date: 2021/11/27
      */
     @Override
-    @Transactional
-    public void edit(Long userId, List<String> roles) {
-        try {
-            //  首先清空该用户所有角色
-            QueryWrapper<SysRoleUser> wrapper = new QueryWrapper<>();
-            wrapper.eq("user_id", userId);
-            roleUserMapper.delete(wrapper);
-            //  然后将用户与角色绑定
-            roles.forEach(role -> {
-                SysRoleUser roleUser = new SysRoleUser();
-                roleUser.setUserId(userId);
-                roleUser.setRoleId(Long.parseLong(role));
-                roleUserMapper.insert(roleUser);
-            });
-        } catch (BadRequestException e) {
-            e.printStackTrace();
-            throw new BadRequestException(e.getMsg());
-        }
+    @Transactional(rollbackFor = BadRequestException.class)
+    public void edit(Long userId, List<String> roleIds) {
+        //  首先清空该用户所有角色
+        QueryWrapper<SysRoleUser> wrapper = new QueryWrapper<>();
+        wrapper.eq("user_id", userId);
+        roleUserMapper.delete(wrapper);
+        //  然后将用户与角色绑定
+        roleIds.forEach(role -> {
+            SysRoleUser roleUser = new SysRoleUser();
+            roleUser.setUserId(userId);
+            roleUser.setRoleId(Long.parseLong(role));
+            roleUserMapper.insert(roleUser);
+        });
     }
 
     /**
@@ -84,14 +75,9 @@ public class SysRoleUserServiceImpl implements SysRoleUserService {
      */
     @Override
     public List<SysRoleUser> getRoleUserByUserId(Long userId) {
-        try {
-            QueryWrapper<SysRoleUser> wrapper = new QueryWrapper<>();
-            wrapper.eq("user_id", userId);
-            return roleUserMapper.selectList(wrapper);
-        } catch (BadRequestException e) {
-            e.printStackTrace();
-            throw new BadRequestException(e.getMsg());
-        }
+        QueryWrapper<SysRoleUser> wrapper = new QueryWrapper<>();
+        wrapper.eq("user_id", userId);
+        return roleUserMapper.selectList(wrapper);
     }
 
     /**
@@ -104,13 +90,8 @@ public class SysRoleUserServiceImpl implements SysRoleUserService {
      */
     @Override
     public void deleteByUserId(String userId) {
-        try {
-            LambdaQueryWrapper<SysRoleUser> wrapper = new LambdaQueryWrapper<>();
-            wrapper.eq(SysRoleUser::getUserId, userId);
-            roleUserMapper.delete(wrapper);
-        } catch (BadRequestException e) {
-            e.printStackTrace();
-            throw new BadRequestException(e.getMsg());
-        }
+        LambdaQueryWrapper<SysRoleUser> wrapper = new LambdaQueryWrapper<>();
+        wrapper.eq(SysRoleUser::getUserId, userId);
+        roleUserMapper.delete(wrapper);
     }
 }

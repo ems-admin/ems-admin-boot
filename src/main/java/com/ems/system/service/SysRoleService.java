@@ -1,6 +1,7 @@
 package com.ems.system.service;
 
-import com.alibaba.fastjson.JSONArray;
+import com.alibaba.fastjson2.JSONArray;
+import com.baomidou.mybatisplus.extension.service.IService;
 import com.ems.system.entity.SysRole;
 import org.springframework.security.core.GrantedAuthority;
 
@@ -12,7 +13,7 @@ import java.util.List;
  * @author: starao
  * @create: 2021-11-27 14:26
  **/
-public interface SysRoleService {
+public interface SysRoleService extends IService<SysRole> {
 
     /**
     * @Description: 获取角色列表

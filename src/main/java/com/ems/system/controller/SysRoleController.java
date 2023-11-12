@@ -2,6 +2,7 @@ package com.ems.system.controller;
 
 import com.ems.common.exception.BadRequestException;
 import com.ems.common.utils.ResultUtil;
+import com.ems.common.utils.StringUtil;
 import com.ems.logs.annotation.Log;
 import com.ems.system.entity.SysRole;
 import com.ems.system.service.SysRoleService;
@@ -52,10 +53,10 @@ public class SysRoleController extends ResultUtil {
     @PostMapping("/role/edit")
     @PreAuthorize("hasRole('ROLE_ADMIN')")
     public ResponseEntity<Object> editRole(@RequestBody SysRole role){
-        String tag = role.getId() == null ? "添加成功" : "修改成功";
+        String str = StringUtil.getEditType(role.getId());
         try {
             roleService.editRole(role);
-            return success(true, tag);
+            return success(true, str);
         } catch (BadRequestException e) {
             e.printStackTrace();
             return fail(false, e.getMsg());

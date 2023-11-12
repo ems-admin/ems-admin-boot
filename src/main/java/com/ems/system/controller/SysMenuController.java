@@ -3,6 +3,7 @@ package com.ems.system.controller;
 import com.ems.common.exception.BadRequestException;
 import com.ems.common.utils.ResultUtil;
 import com.ems.common.utils.SecurityUtil;
+import com.ems.common.utils.StringUtil;
 import com.ems.logs.annotation.Log;
 import com.ems.system.entity.SysMenu;
 import com.ems.system.service.SysMenuService;
@@ -45,18 +46,17 @@ public class SysMenuController extends ResultUtil {
     }
 
     /**
-    * @Description: 获取左侧菜单树
+    * @Description: 获取权限列表
     * @Param: []
     * @return: org.springframework.http.ResponseEntity<java.lang.Object>
     * @Author: starao
-    * @Date: 2022/3/20
+    * @Date: 2022/10/6
     */
-    @Log("获取左侧菜单树")
-    @GetMapping("/menu/tree/left")
-    public ResponseEntity<Object> getMenuTreeForLeft(){
+    @Log(value = "获取权限列表")
+    @GetMapping("/menu/permission")
+    public ResponseEntity<Object> getPermission(){
         try {
-            List<String> roles = SecurityUtil.getCurrentRoles();
-            return success(true, menuService.getMenuTreeForLeft(roles));
+            return success(true, menuService.getPermission());
         } catch (BadRequestException e) {
             e.printStackTrace();
             return fail(false, e.getMsg());
@@ -100,24 +100,6 @@ public class SysMenuController extends ResultUtil {
     }
 
     /**
-    * @Description: 获取下拉框里面的树
-    * @Param: [type]
-    * @return: org.springframework.http.ResponseEntity<java.lang.Object>
-    * @Author: starao
-    * @Date: 2021/11/27
-    */
-    @Log("获取下拉框里面的树")
-    @GetMapping("/menu/select/tree")
-    public ResponseEntity<Object> getMenuSelectTree(String type){
-        try {
-            return success(true, menuService.getMenuSelectTree(type));
-        } catch (BadRequestException e) {
-            e.printStackTrace();
-            return fail(false, e.getMsg());
-        }
-    }
-
-    /**
     * @Description: 编辑菜单
     * @Param: [sysMenu]
     * @return: org.springframework.http.ResponseEntity<java.lang.Object>
@@ -128,8 +110,9 @@ public class SysMenuController extends ResultUtil {
     @PostMapping("/menu/edit")
     public ResponseEntity<Object> editMenu(@RequestBody SysMenu sysMenu){
         try {
+            String str = StringUtil.getEditType(sysMenu.getId());
             menuService.editMenu(sysMenu);
-            return success(true, sysMenu.getId() == null ? "添加成功" : "修改成功");
+            return success(true, str);
         } catch (BadRequestException e) {
             e.printStackTrace();
             return fail(false, e.getMsg());
@@ -155,18 +138,11 @@ public class SysMenuController extends ResultUtil {
         }
     }
 
-    /**
-    * @Description: 获取角色菜单树
-    * @Param: [roleId]
-    * @return: org.springframework.http.ResponseEntity<java.lang.Object>
-    * @Author: starao
-    * @Date: 2021/11/27
-    */
-    @Log("获取角色菜单树")
-    @GetMapping("/menu/role/tree")
-    public ResponseEntity<Object> getMenuTreeByRoleId(String roleId){
+    @Log(value = "获取菜单下拉树")
+    @GetMapping("/menu/select")
+    public ResponseEntity<Object> getMenuTreeSelect(){
         try {
-            return success(true, menuService.getMenuTreeByRoleId(roleId));
+            return success(true, menuService.getMenuTreeSelect());
         } catch (BadRequestException e) {
             e.printStackTrace();
             return fail(false, e.getMsg());

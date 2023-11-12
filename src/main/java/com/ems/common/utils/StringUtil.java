@@ -1,10 +1,10 @@
 package com.ems.common.utils;
 
+import jakarta.servlet.http.HttpServletRequest;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import javax.servlet.http.HttpServletRequest;
 import java.net.InetAddress;
 import java.net.UnknownHostException;
 
@@ -50,5 +50,20 @@ public class StringUtil extends StringUtils {
             }
         }
         return ip;
+    }
+    
+    /**
+    * @Description: 获取编辑类型
+    * @Param: [id]
+    * @return: java.lang.String
+    * @Author: starao
+    * @Date: 2022/11/10
+    */
+    public static String getEditType(Long id){
+        if (id != null){
+            return "编辑成功";
+        } else {
+            return "添加成功";
+        }
     }
 }

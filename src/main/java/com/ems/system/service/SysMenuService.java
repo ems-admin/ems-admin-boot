@@ -1,6 +1,7 @@
 package com.ems.system.service;
 
-import com.alibaba.fastjson.JSONArray;
+import com.alibaba.fastjson2.JSONArray;
+import com.baomidou.mybatisplus.extension.service.IService;
 import com.ems.system.entity.SysMenu;
 
 import java.util.List;
@@ -11,7 +12,7 @@ import java.util.List;
  * @author: starao
  * @create: 2021-11-27 14:24
  **/
-public interface SysMenuService {
+public interface SysMenuService extends IService<SysMenu> {
 
     /**
     * @Description: 获取菜单树
@@ -21,15 +22,6 @@ public interface SysMenuService {
     * @Date: 2021/11/27
     */
     JSONArray getMenuTree(List<String> roles);
-
-    /**
-    * @Description: 获取下拉框里面的树
-    * @Param: [type]
-    * @return: com.alibaba.fastjson.JSONArray
-    * @Author: starao
-    * @Date: 2021/11/27
-    */
-    JSONArray getMenuSelectTree(String type);
 
     /**
     * @Description: 编辑菜单
@@ -48,15 +40,6 @@ public interface SysMenuService {
     * @Date: 2021/11/27
     */
     void delMenu(Long id);
-
-    /**
-    * @Description: 获取角色菜单树
-    * @Param: [roleId]
-    * @return: com.alibaba.fastjson.JSONArray
-    * @Author: starao
-    * @Date: 2021/11/27
-    */
-    JSONArray getMenuTreeByRoleId(String roleId);
 
     /**
     * @Description: 查询当前用户所有权限菜单
@@ -86,11 +69,20 @@ public interface SysMenuService {
     List<String> getUrlsByRoles(List<String> currentRoles);
 
     /**
-    * @Description: 获取左侧菜单树
-    * @Param: [roles]
+    * @Description: 获取权限列表
+    * @Param: []
+    * @return: java.util.List<java.lang.String>
+    * @Author: starao
+    * @Date: 2022/10/6
+    */
+    List<String> getPermission();
+
+    /**
+    * @Description: 获取菜单下拉树
+    * @Param: []
     * @return: com.alibaba.fastjson.JSONArray
     * @Author: starao
-    * @Date: 2022/3/20
+    * @Date: 2023/8/15
     */
-    JSONArray getMenuTreeForLeft(List<String> roles);
+    JSONArray getMenuTreeSelect();
 }

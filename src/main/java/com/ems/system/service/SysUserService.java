@@ -1,6 +1,10 @@
 package com.ems.system.service;
 
+import com.alibaba.fastjson2.JSONObject;
+import com.baomidou.mybatisplus.core.metadata.IPage;
+import com.baomidou.mybatisplus.extension.service.IService;
 import com.ems.system.entity.SysUser;
+import com.ems.system.entity.dto.QueryDto;
 import com.ems.system.entity.dto.UserDto;
 
 import java.util.List;
@@ -11,7 +15,7 @@ import java.util.List;
  * @author: starao
  * @create: 2021-11-27 14:28
  **/
-public interface SysUserService {
+public interface SysUserService extends IService<SysUser> {
 
     /**
     * @Description: 根据用户名查询用户
@@ -33,12 +37,12 @@ public interface SysUserService {
 
     /**
     * @Description: 查询用户列表
-    * @Param: [blurry]
+    * @Param: [queryDto]
     * @return: java.util.List<com.ems.system.entity.SysUser>
     * @Author: starao
     * @Date: 2021/11/27
     */
-    List<UserDto> queryUserTable(String blurry);
+    IPage<UserDto> queryUserTable(QueryDto queryDto);
 
     /**
     * @Description: 根据用户名查询用户
@@ -66,4 +70,13 @@ public interface SysUserService {
     * @Date: 2021/11/27
     */
     void enabledUser(SysUser sysUser);
+
+    /**
+    * @Description: 修改用户密码
+    * @Param: [jsonObject]
+    * @return: void
+    * @Author: starao
+    * @Date: 2022/10/6
+    */
+    void updatePassword(JSONObject jsonObject);
 }

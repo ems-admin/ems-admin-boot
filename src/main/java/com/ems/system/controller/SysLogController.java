@@ -2,7 +2,7 @@ package com.ems.system.controller;
 
 import com.ems.common.exception.BadRequestException;
 import com.ems.common.utils.ResultUtil;
-import com.ems.system.entity.dto.LogDto;
+import com.ems.system.entity.dto.QueryDto;
 import com.ems.system.service.SysLogService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
@@ -25,15 +25,15 @@ public class SysLogController extends ResultUtil {
 
     /**
     * @Description: 查询日志列表
-    * @Param: [logDto]
+    * @Param: [queryDto, logType]
     * @return: org.springframework.http.ResponseEntity<java.lang.Object>
     * @Author: starao
     * @Date: 2021/11/27
     */
     @GetMapping("/log/list")
-    public ResponseEntity<Object> getLogList(LogDto logDto){
+    public ResponseEntity<Object> getLogList(QueryDto queryDto, String logType){
         try {
-            return success(true, logService.getLogList(logDto));
+            return success(true, logService.getLogList(queryDto, logType));
         } catch (BadRequestException e) {
             e.printStackTrace();
             return fail(false, e.getMsg());

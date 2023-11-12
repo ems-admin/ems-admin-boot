@@ -1,9 +1,11 @@
 package com.ems.system.service.impl;
 
-import com.alibaba.fastjson.JSONArray;
-import com.alibaba.fastjson.JSONObject;
+import com.alibaba.fastjson2.JSONArray;
+import com.alibaba.fastjson2.JSONObject;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
+import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
+import com.ems.common.constant.CommonConstants;
 import com.ems.common.exception.BadRequestException;
 import com.ems.system.entity.SysRole;
 import com.ems.system.entity.SysRoleUser;
@@ -32,7 +34,7 @@ import java.util.stream.Collectors;
  **/
 @Service
 @RequiredArgsConstructor
-public class SysRoleServiceImpl implements SysRoleService {
+public class SysRoleServiceImpl extends ServiceImpl<SysRoleMapper, SysRole> implements SysRoleService {
 
     private final SysRoleMapper roleMapper;
 
@@ -50,20 +52,13 @@ public class SysRoleServiceImpl implements SysRoleService {
      */
     @Override
     public List<SysRole> getRoleList(String blurry) {
-        try {
-            LambdaQueryWrapper<SysRole> wrapper = new LambdaQueryWrapper<>();
-            if (StringUtils.isNotBlank(blurry)){
-                wrapper.like(SysRole::getRoleName, blurry);
-                wrapper.or();
-                wrapper.like(SysRole::getRoleCode, blurry);
-                wrapper.or();
-                wrapper.like(SysRole::getDescription, blurry);
-            }
-            return roleMapper.selectList(wrapper);
-        } catch (BadRequestException e) {
-            e.printStackTrace();
-            throw new BadRequestException(e.getMsg());
+        LambdaQueryWrapper<SysRole> wrapper = new LambdaQueryWrapper<>();
+        //  隐藏超级管理员角色,避免误操作
+        wrapper.ne(SysRole::getRoleCode, CommonConstants.ROLE_ADMIN);
+        if (StringUtils.isNotBlank(blurry)){
+            wrapper.and(q -> q.like(SysRole::getRoleCode, blurry).or().like(SysRole::getRoleName, blurry));
         }
+        return roleMapper.selectList(wrapper);
     }
 
     /**
@@ -76,17 +71,12 @@ public class SysRoleServiceImpl implements SysRoleService {
      */
     @Override
     public void editRole(SysRole role) {
-        try {
-            //  校验角色代码及名称
-            checkRole(role);
-            if (role.getId() != null){
-                roleMapper.updateById(role);
-            } else {
-                roleMapper.insert(role);
-            }
-        } catch (BadRequestException e) {
-            e.printStackTrace();
-            throw new BadRequestException(e.getMsg());
+        //  校验角色代码及名称
+        checkRole(role);
+        if (role.getId() != null){
+            roleMapper.updateById(role);
+        } else {
+            roleMapper.insert(role);
         }
     }
 
@@ -99,19 +89,14 @@ public class SysRoleServiceImpl implements SysRoleService {
      * @Date: 2021/11/27
      */
     @Override
-    @Transactional
+    @Transactional(rollbackFor = BadRequestException.class)
     public void delRole(Long id) {
-        try {
-            //  校验角色是否已绑定用户
-            checkRoleUser(id);
-            //  先把与角色绑定的菜单删除
-            roleMenuService.deleteByRoleId(id);
-            //  再删除角色
-            roleMapper.deleteById(id);
-        } catch (BadRequestException e) {
-            e.printStackTrace();
-            throw new BadRequestException(e.getMsg());
-        }
+        //  校验角色是否已绑定用户
+        checkRoleUser(id);
+        //  先把与角色绑定的菜单删除
+        roleMenuService.deleteByRoleId(id);
+        //  再删除角色
+        roleMapper.deleteById(id);
     }
 
     /**
@@ -124,29 +109,24 @@ public class SysRoleServiceImpl implements SysRoleService {
      */
     @Override
     public JSONArray getAllRoleForXm(Long userId) {
-        try {
-            //  查询所有角色
-            List<SysRole> list = roleMapper.selectList(null);
-            //  查询当前用户角色
-            List<SysRoleUser> roleUserList = roleUserService.getRoleUserByUserId(userId);
-            JSONArray jsonArray = new JSONArray();
-            if (!CollectionUtils.isEmpty(list)){
-                for (SysRole role : list) {
-                    JSONObject jsonObject = new JSONObject();
-                    jsonObject.put("name", role.getRoleName());
-                    jsonObject.put("id", role.getId());
+        //  查询所有角色
+        List<SysRole> list = roleMapper.selectList(null);
+        //  查询当前用户角色
+        List<SysRoleUser> roleUserList = roleUserService.getRoleUserByUserId(userId);
+        JSONArray jsonArray = new JSONArray();
+        if (!CollectionUtils.isEmpty(list)){
+            for (SysRole role : list) {
+                JSONObject jsonObject = new JSONObject();
+                jsonObject.put("name", role.getRoleName());
+                jsonObject.put("id", role.getId());
 
-                    if (!CollectionUtils.isEmpty(roleUserList) && roleUserList.get(0).getRoleId().equals(role.getId())){
-                        jsonObject.put("selected", true);
-                    }
-                    jsonArray.add(jsonObject);
+                if (!CollectionUtils.isEmpty(roleUserList) && roleUserList.get(0).getRoleId().equals(role.getId())){
+                    jsonObject.put("selected", true);
                 }
+                jsonArray.add(jsonObject);
             }
-            return jsonArray;
-        } catch (BadRequestException e) {
-            e.printStackTrace();
-            throw new BadRequestException(e.getMsg());
         }
+        return jsonArray;
     }
 
     /**
@@ -159,12 +139,7 @@ public class SysRoleServiceImpl implements SysRoleService {
      */
     @Override
     public List<SysRole> getRoleByUserId(Long userId) {
-        try {
-            return roleMapper.getRoleByUserId(userId);
-        } catch (BadRequestException e) {
-            e.printStackTrace();
-            throw new BadRequestException(e.getMsg());
-        }
+        return roleMapper.getRoleByUserId(userId);
     }
 
     /**
@@ -195,20 +170,15 @@ public class SysRoleServiceImpl implements SysRoleService {
     * @Date: 2021/11/27
     */
     private void checkRole(SysRole role){
-        try {
-            List<SysRole> list;
-            QueryWrapper<SysRole> wrapper = new QueryWrapper<>();
-            if (role.getId() != null){
-                wrapper.ne("id", role.getId());
-            }
-            wrapper.and(w -> w.eq("role_name", role.getRoleName()).or().eq("role_code", role.getRoleCode()));
-            list = roleMapper.selectList(wrapper);
-            if (list != null && !list.isEmpty()){
-                throw new BadRequestException("角色代码或名称已存在，请重新输入");
-            }
-        } catch (BadRequestException e) {
-            e.printStackTrace();
-            throw new BadRequestException(e.getMsg());
+        List<SysRole> list;
+        QueryWrapper<SysRole> wrapper = new QueryWrapper<>();
+        if (role.getId() != null){
+            wrapper.ne("id", role.getId());
+        }
+        wrapper.and(w -> w.eq("role_name", role.getRoleName()).or().eq("role_code", role.getRoleCode()));
+        list = roleMapper.selectList(wrapper);
+        if (list != null && !list.isEmpty()){
+            throw new BadRequestException("角色代码或名称已存在，请重新输入");
         }
     }
 

@@ -32,18 +32,19 @@
         </foreach>
     </select>
 
-    <!--根据角色获取菜单-->
-    <select id="getMenuTreeByRoleId" resultType="java.lang.String">
-        SELECT t1.id FROM sys_menu t1 LEFT JOIN sys_role_menu t2 ON t1.ID=t2.menu_id WHERE t2.role_id = #{roleId}
-    </select>
-
-    <!--通过菜单Id获取所有上级菜单-->
-    <select id="getAllMenusByChildId" resultType="com.ems.system.entity.SysMenu">
-        SELECT T2.* FROM (
-            SELECT @r AS _id,(
-                SELECT @r :=parent_id FROM sys_menu WHERE id=_id) AS parent_id,@l :=@l+1 AS lvl FROM (
-                    SELECT @r :=17,@l :=0) vars,sys_menu h) T1 JOIN sys_menu T2 ON T1._id=T2.id
-        ORDER BY T2.id
+    <!--获取当前用户的按钮权限-->
+    <select id="getPermission" resultType="java.lang.String">
+        SELECT
+            t1.permission
+        FROM
+            sys_menu t1
+            LEFT JOIN sys_role_menu t2 ON t1.id = t2.menu_id
+            LEFT JOIN sys_role t3 ON t2.role_id = t3.id
+        WHERE
+                t3.role_code IN
+            <foreach collection="roles" item="role" open="(" separator="," close=")">
+                #{role}
+            </foreach>
     </select>
 
 </mapper>

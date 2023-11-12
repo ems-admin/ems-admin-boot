@@ -24,6 +24,11 @@ public class SecurityConstants {
     public static final String JWT_SECRET_KEY = "B?E(H+MbQeShVmYq3t6w9z$C&F)J@NcRfUjWnZr4u7x!A%D*G-KaPdSgVkYp3s5v";
 
     /**
+     * 刷新refresh_token的密钥
+     */
+    public static final String JWT_REFRESH_KEY = "q3t6w9z$C&F)H@McQfTjWnZr4u7x!A%D*G-KaNdRgUkXp2s5v8y/B?E(H+MbQeSh";
+
+    /**
      * token前缀,用在请求头里Authorization
      */
     public static final String TOKEN_PREFIX = "Bearer ";

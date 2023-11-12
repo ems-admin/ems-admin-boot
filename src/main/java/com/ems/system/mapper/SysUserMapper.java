@@ -1,6 +1,8 @@
 package com.ems.system.mapper;
 
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
+import com.baomidou.mybatisplus.core.metadata.IPage;
+import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.ems.system.entity.SysUser;
 import com.ems.system.entity.dto.UserDto;
 import org.apache.ibatis.annotations.Param;
@@ -33,5 +35,5 @@ public interface SysUserMapper extends BaseMapper<SysUser> {
     * @Author: starao
     * @Date: 2021/12/4
     */
-    List<UserDto> queryUserTable(@Param("blurry") String blurry);
+    IPage<UserDto> queryUserTable(Page<?> page, @Param("blurry") String blurry);
 }

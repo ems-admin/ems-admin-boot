@@ -7,23 +7,24 @@
     <parent>
         <artifactId>spring-boot-starter-parent</artifactId>
         <groupId>org.springframework.boot</groupId>
-        <version>2.5.2</version>
+        <version>3.1.5</version>
     </parent>
 
     <groupId>com.ems</groupId>
-    <artifactId>ems-admin-boot</artifactId>
+    <artifactId>ems-admin-react</artifactId>
     <version>1.0.0</version>
 
     <!--版本管理-->
     <properties>
-        <maven.compiler.source>8</maven.compiler.source>
-        <maven.compiler.target>8</maven.compiler.target>
+        <maven.compiler.source>21</maven.compiler.source>
+        <maven.compiler.target>21</maven.compiler.target>
         <jwt-version>0.11.2</jwt-version>
-        <lombok-version>1.18.20</lombok-version>
-        <mysql-version>8.0.27</mysql-version>
+        <lombok-version>1.18.30</lombok-version>
+        <mysql-version>8.0.28</mysql-version>
         <commons-version>3.12.0</commons-version>
         <problem-version>0.25.2</problem-version>
-        <fastjson-version>1.2.70</fastjson-version>
+        <fastjson-version>2.0.42</fastjson-version>
+        <mybatis-plus-version>3.5.3.1</mybatis-plus-version>
     </properties>
 
     <dependencies>
@@ -59,7 +60,7 @@
         <dependency>
             <groupId>com.baomidou</groupId>
             <artifactId>mybatis-plus-boot-starter</artifactId>
-            <version>3.4.3.4</version>
+            <version>${mybatis-plus-version}</version>
         </dependency>
         <!--redis-->
         <dependency>
@@ -87,7 +88,7 @@
         <dependency>
             <groupId>org.projectlombok</groupId>
             <artifactId>lombok</artifactId>
-            <version>${lombok.version}</version>
+            <version>${lombok-version}</version>
         </dependency>
         <!--StringUtils-->
         <dependency>
@@ -97,8 +98,8 @@
         </dependency>
         <!--fastjson-->
         <dependency>
-            <groupId>com.alibaba</groupId>
-            <artifactId>fastjson</artifactId>
+            <groupId>com.alibaba.fastjson2</groupId>
+            <artifactId>fastjson2</artifactId>
             <version>${fastjson-version}</version>
         </dependency>
         <dependency>
@@ -106,14 +107,33 @@
             <artifactId>problem-spring-web-starter</artifactId>
             <version>${problem-version}</version>
         </dependency>
-        <!--兼容jdk11-->
+        <!-- guava -->
         <dependency>
-            <groupId>jakarta.xml.bind</groupId>
-            <artifactId>jakarta.xml.bind-api</artifactId>
-            <version>2.3.3</version>
+            <groupId>com.google.guava</groupId>
+            <artifactId>guava</artifactId>
+            <version>32.1.1-jre</version>
+        </dependency>
+        <!-- Java图形验证码 -->
+        <dependency>
+            <groupId>com.github.whvcse</groupId>
+            <artifactId>easy-captcha</artifactId>
+            <version>1.6.2</version>
+        </dependency>
+        <!--兼容高版本JDK,不然使用验证码会报错-->
+        <dependency>
+            <groupId>org.openjdk.nashorn</groupId>
+            <artifactId>nashorn-core</artifactId>
+            <version>15.4</version>
+        </dependency>
+        <!-- jaxb-api -->
+        <dependency>
+            <groupId>javax.xml.bind</groupId>
+            <artifactId>jaxb-api</artifactId>
+            <version>2.4.0-b180830.0359</version>
         </dependency>
     </dependencies>
 
+    <!--集中打包-->
     <build>
         <plugins>
             <plugin>

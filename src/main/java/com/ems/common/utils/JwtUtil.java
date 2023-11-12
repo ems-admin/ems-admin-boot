@@ -7,8 +7,6 @@ import io.jsonwebtoken.security.InvalidKeyException;
 import io.jsonwebtoken.security.Keys;
 import io.jsonwebtoken.security.SignatureException;
 import lombok.extern.slf4j.Slf4j;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
@@ -31,6 +29,8 @@ import java.util.stream.Collectors;
 public class JwtUtil {
 
     private static final byte[] secretKey = DatatypeConverter.parseBase64Binary(SecurityConstants.JWT_SECRET_KEY);
+
+    private static final byte[] refreshKey = DatatypeConverter.parseBase64Binary(SecurityConstants.JWT_REFRESH_KEY);
 
     private JwtUtil(){
         throw new IllegalStateException("禁止创建当前对象");
@@ -69,6 +69,21 @@ public class JwtUtil {
             e.printStackTrace();
             throw new BadRequestException(e.getMessage());
         }
+    }
+
+    /**
+    * @Description: 生成refresh_token
+    * @Param: [userName]
+    * @return: java.lang.String
+    * @Author: starao
+    * @Date: 2022/10/5
+    */
+    public static String getRefreshToken(String userName){
+        return Jwts.builder()
+                .signWith(Keys.hmacShaKeyFor(refreshKey))
+                .setSubject(userName)
+                .setExpiration(new Date(System.currentTimeMillis() + SecurityConstants.TOKEN_EXPIRATION_REMEMBER_TIME * 1000))
+                .compact();
     }
 
     /**
@@ -138,6 +153,21 @@ public class JwtUtil {
                 .setSigningKey(secretKey)
                 .build()
                 .parseClaimsJws(token)
+                .getBody();
+    }
+    
+    /**
+    * @Description: 从refreshToken中获取用户信息
+    * @Param: [refreshToken]
+    * @return: io.jsonwebtoken.Claims
+    * @Author: starao
+    * @Date: 2022/10/5
+    */
+    public static Claims getRefreshTokenBody(String refreshToken){
+        return Jwts.parserBuilder()
+                .setSigningKey(refreshKey)
+                .build()
+                .parseClaimsJws(refreshToken)
                 .getBody();
     }
 }

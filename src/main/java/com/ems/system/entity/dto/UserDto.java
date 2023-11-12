@@ -29,5 +29,9 @@ public class UserDto {
 
     private Boolean enabled;
 
-    private List<Long> roleIds;
+    private List<String> roleIds;
+
+    private String uuid;
+
+    private String code;
 }
