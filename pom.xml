@@ -18,7 +18,7 @@
     <properties>
         <maven.compiler.source>21</maven.compiler.source>
         <maven.compiler.target>21</maven.compiler.target>
-        <jwt-version>0.11.2</jwt-version>
+        <jwt-version>0.13.0</jwt-version>
         <lombok-version>1.18.42</lombok-version>
         <mysql-version>9.4.0</mysql-version>
         <commons-version>3.19.0</commons-version>

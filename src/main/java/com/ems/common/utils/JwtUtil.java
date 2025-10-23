@@ -1,5 +1,7 @@
 package com.ems.common.utils;
 
+import com.alibaba.fastjson2.JSON;
+import com.alibaba.fastjson2.TypeReference;
 import com.ems.common.constant.SecurityConstants;
 import com.ems.common.exception.BadRequestException;
 import io.jsonwebtoken.*;
@@ -13,11 +15,14 @@ import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.User;
 import org.springframework.util.CollectionUtils;
 
+import javax.crypto.SecretKey;
 import javax.xml.bind.DatatypeConverter;
-import java.util.Collections;
-import java.util.Date;
-import java.util.List;
+import java.nio.charset.StandardCharsets;
+import java.util.*;
 import java.util.stream.Collectors;
+
+import static javax.crypto.Cipher.SECRET_KEY;
+import static net.sf.jsqlparser.util.validation.metadata.NamedObject.role;
 
 /**
  * @program: ems-admin-boot
@@ -28,12 +33,21 @@ import java.util.stream.Collectors;
 @Slf4j
 public class JwtUtil {
 
-    private static final byte[] secretKey = DatatypeConverter.parseBase64Binary(SecurityConstants.JWT_SECRET_KEY);
+    private static final String secretKey = SecurityConstants.JWT_SECRET_KEY;
 
-    private static final byte[] refreshKey = DatatypeConverter.parseBase64Binary(SecurityConstants.JWT_REFRESH_KEY);
+    private static final String refreshKey = SecurityConstants.JWT_REFRESH_KEY;
 
     private JwtUtil(){
         throw new IllegalStateException("禁止创建当前对象");
+    }
+
+    /**
+     * 生成 SecretKey
+     * @return
+     */
+    private static SecretKey getSigningKey() {
+        byte[] keyBytes = secretKey.getBytes(StandardCharsets.UTF_8);
+        return Keys.hmacShaKeyFor(keyBytes);
     }
 
     /**
@@ -43,27 +57,29 @@ public class JwtUtil {
     * @Author: starao
     * @Date: 2021/11/27
     */
-    public static String generateToken(String userName, List<String> roles, Boolean isRemember){
+    public static String generateToken(String userId, String userName, List<String> roles, Boolean isRemember){
         try {
             //  过期时间
             long expirationTime = isRemember ? SecurityConstants.TOKEN_EXPIRATION_REMEMBER_TIME : SecurityConstants.TOKEN_EXPIRATION_TIME;
 
+            Date now = new Date();
+            Date expiryDate = new Date(now.getTime() + expirationTime);
+
+            // 创建自定义声明
+            Map<String, Object> claims = new HashMap<>();
+            claims.put("username", userName);
+            claims.put(SecurityConstants.TOKEN_ROLE_CLAIM, roles);
             //  生成token
             return Jwts.builder()
-                    //  生成签证信息
-                    .setHeaderParam("typ", SecurityConstants.TOKEN_TYPE)
-                    .signWith(Keys.hmacShaKeyFor(secretKey))
-                    //  所有人
-                    .setSubject(userName)
-                    //  角色
-                    .claim(SecurityConstants.TOKEN_ROLE_CLAIM, roles)
-                    //  JWT主体
-                    .setIssuer(SecurityConstants.TOKEN_ISSUER)
-                    //  签发时间
-                    .setIssuedAt(new Date())
-                    .setAudience(SecurityConstants.TOKEN_AUDIENCE)
-                    //  设置有效时间
-                    .setExpiration(new Date(System.currentTimeMillis() + expirationTime * 1000))
+                    .subject(userId)
+                    .claims(claims)                            // 批量添加声明
+                    .issuer(SecurityConstants.TOKEN_ISSUER)                   // 签发者
+                    .audience().add(SecurityConstants.TOKEN_AUDIENCE).and()     // 受众
+                    .issuedAt(now)                             // 签发时间
+                    .expiration(expiryDate)                    // 过期时间
+                    .notBefore(now)                            // 生效时间
+                    .id(java.util.UUID.randomUUID().toString()) // JWT ID
+                    .signWith(getSigningKey())                 // 使用密钥签名
                     .compact();
         } catch (InvalidKeyException e) {
             e.printStackTrace();
@@ -78,11 +94,15 @@ public class JwtUtil {
     * @Author: starao
     * @Date: 2022/10/5
     */
-    public static String getRefreshToken(String userName){
+    public static String getRefreshToken(String userId, String userName){
+        Date now = new Date();
+        Date expiryDate = new Date(now.getTime() + SecurityConstants.TOKEN_EXPIRATION_REMEMBER_TIME * 1000);
         return Jwts.builder()
-                .signWith(Keys.hmacShaKeyFor(refreshKey))
-                .setSubject(userName)
-                .setExpiration(new Date(System.currentTimeMillis() + SecurityConstants.TOKEN_EXPIRATION_REMEMBER_TIME * 1000))
+                .subject(userId)
+                .claim("username", userName)
+                .issuedAt(now)
+                .expiration(expiryDate)
+                .signWith(getSigningKey())
                 .compact();
     }
 
@@ -131,7 +151,8 @@ public class JwtUtil {
             claims = e.getClaims();
         }
         //  获取用户角色
-        List<String> roles = (List<String>) claims.get(SecurityConstants.TOKEN_ROLE_CLAIM);
+        String string = claims.get(SecurityConstants.TOKEN_ROLE_CLAIM).toString();
+        List<String> roles = JSON.parseObject(string, new TypeReference<>() {});
         List<SimpleGrantedAuthority> authorities =
                 CollectionUtils.isEmpty(roles) ? Collections.singletonList(new SimpleGrantedAuthority("ROLE_USER")) :
                         roles.stream().map(SimpleGrantedAuthority::new).collect(Collectors.toList());
@@ -149,11 +170,11 @@ public class JwtUtil {
     * @Date: 2021/11/27
     */
     private static Claims getTokenBody(String token){
-        return Jwts.parserBuilder()
-                .setSigningKey(secretKey)
+        return Jwts.parser()
+                .verifyWith(getSigningKey())
                 .build()
-                .parseClaimsJws(token)
-                .getBody();
+                .parseSignedClaims(token)
+                .getPayload();
     }
     
     /**
@@ -164,10 +185,10 @@ public class JwtUtil {
     * @Date: 2022/10/5
     */
     public static Claims getRefreshTokenBody(String refreshToken){
-        return Jwts.parserBuilder()
-                .setSigningKey(refreshKey)
+        return Jwts.parser()
+                .verifyWith(getSigningKey())
                 .build()
-                .parseClaimsJws(refreshToken)
-                .getBody();
+                .parseSignedClaims(refreshToken)
+                .getPayload();
     }
 }

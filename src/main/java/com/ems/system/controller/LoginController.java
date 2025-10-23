@@ -68,9 +68,9 @@ public class LoginController extends ResultUtil {
             //  获取当前用户角色
             List<String> roles = getRolesByUserId(user.getId());
             //  生成token
-            String token = JwtUtil.generateToken(user.getUsername(), roles, false);
+            String token = JwtUtil.generateToken(user.getId().toString(), user.getUsername(), roles, false);
             //  生成refresh_token
-            String refreshToken = JwtUtil.getRefreshToken(user.getUsername());
+            String refreshToken = JwtUtil.getRefreshToken(user.getId().toString(), user.getUsername());
 
             //  用户信息
             userDto.setEmail(user.getEmail());
@@ -131,7 +131,7 @@ public class LoginController extends ResultUtil {
                     //  获取当前用户角色
                     List<String> roles = getRolesByUserId(user.getId());
                     //  重新获取token
-                    String token = JwtUtil.generateToken(user.getUsername(), roles, false);
+                    String token = JwtUtil.generateToken(user.getId().toString(), user.getUsername(), roles, false);
                     return success(true, token);
                 }
             }
