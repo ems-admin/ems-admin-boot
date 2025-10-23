@@ -14,8 +14,7 @@ import com.ems.system.entity.SysUser;
 import com.ems.system.entity.dto.UserDto;
 import com.ems.system.service.SysRoleService;
 import com.ems.system.service.SysUserService;
-import com.wf.captcha.ArithmeticCaptcha;
-import com.wf.captcha.base.Captcha;
+import com.pig4cloud.captcha.ArithmeticCaptcha;
 import io.jsonwebtoken.Claims;
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
@@ -24,11 +23,9 @@ import org.springframework.security.authentication.UsernamePasswordAuthenticatio
 import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.*;
-import java.util.concurrent.TimeUnit;
 
 /**
  * @program: ems-admin-boot
@@ -155,25 +152,26 @@ public class LoginController extends ResultUtil {
     @GetMapping("/code")
     public ResponseEntity<Object> getVerifyCode(){
         try {
-            // 获取运算的结果
-            Captcha captcha = new ArithmeticCaptcha(VerifyCodeConstants.width, VerifyCodeConstants.height);
-            String uuid = UUID.randomUUID().toString().replace("-", "");
-            //当验证码类型为 arithmetic时且长度 >= 2 时，captcha.text()的结果有几率为浮点型
+            // 创建一个宽120px、高40px的算术验证码
+            ArithmeticCaptcha captcha = new ArithmeticCaptcha(VerifyCodeConstants.width, VerifyCodeConstants.height);
+            // 参与运算的数字个数
+            captcha.setLen(2);
+            //  加减乘除
+            captcha.supportAlgorithmSign(5);
+            // 获取算术表达式的结果
             String captchaValue = captcha.text();
-            if (captchaValue.contains(".")) {
-                captchaValue = captchaValue.split("\\.")[0];
-            }
             // 缓存验证码信息,时间1分钟
+            String uuid = UUID.randomUUID().toString().replace("-", "");
             cacheConfig.put(uuid, captchaValue, 1);
             // 验证码信息
-            Map<String, Object> imgResult = new HashMap<String, Object>(2) {{
+            Map<String, Object> imgResult = new HashMap<>(2) {{
                 put("img", captcha.toBase64());
                 put("uuid", uuid);
             }};
             return ResponseEntity.ok(imgResult);
-        } catch (BadRequestException e) {
+        } catch (Exception e) {
             e.printStackTrace();
-            return fail(false, e.getMsg());
+            return fail(false, e.getMessage());
         }
     }
 
