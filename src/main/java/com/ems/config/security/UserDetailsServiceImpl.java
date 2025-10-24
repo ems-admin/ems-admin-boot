@@ -34,26 +34,23 @@ public class UserDetailsServiceImpl implements UserDetailsService {
     */
     @Override
     public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
-        boolean searchDb = true;
-        JwtUserDto jwtUserDto = null;
-        if (searchDb) {
-            UserDto user;
-            try {
-                user = userService.loadByName(username);
-            } catch (BadRequestException e) {
-                throw new UsernameNotFoundException("用户名或密码错误", e);
+        JwtUserDto jwtUserDto;
+        UserDto user;
+        try {
+            user = userService.loadByName(username);
+        } catch (BadRequestException e) {
+            throw new UsernameNotFoundException("用户名或密码错误", e);
+        }
+        if (user == null) {
+            throw new UsernameNotFoundException("用户名或密码错误");
+        } else {
+            if (!user.getEnabled()) {
+                throw new BadRequestException("账号未激活！");
             }
-            if (user == null) {
-                throw new UsernameNotFoundException("用户名或密码错误");
-            } else {
-                if (!user.getEnabled()) {
-                    throw new BadRequestException("账号未激活！");
-                }
-                jwtUserDto = new JwtUserDto(
-                        user,
-                        roleService.getRolesByUser(user.getId())
-                );
-            }
+            jwtUserDto = new JwtUserDto(
+                    user,
+                    roleService.getRolesByUser(user.getId())
+            );
         }
         return jwtUserDto;
     }
