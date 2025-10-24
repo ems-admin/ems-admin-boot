@@ -52,12 +52,12 @@ public class LoginController extends ResultUtil {
         try {
             //  校验验证码
             if (StringUtil.isBlank(userDto.getCode()) || !checkCode(userDto.getUuid(), userDto.getCode())){
-                return fail(false, "验证码错误");
+                return fail("验证码错误");
             }
             //  根据用户名查询用户是否存在
             SysUser user = userService.findByName(userDto.getUsername());
             if (user == null){
-                return fail(false, "用户名或密码错误");
+                return fail("用户名或密码错误");
             }
             //  判断密码是否正确
             UsernamePasswordAuthenticationToken authenticationToken =
@@ -79,10 +79,10 @@ public class LoginController extends ResultUtil {
             //  隐藏密码
             userDto.setPassword("******");
 
-            return success(true, new JwtUser(token, refreshToken, userDto));
+            return success(new JwtUser(token, refreshToken, userDto));
         } catch (BadRequestException e) {
             e.printStackTrace();
-            return fail(false, e.getMsg());
+            return fail(e.getMsg());
         }
     }
 
@@ -98,10 +98,10 @@ public class LoginController extends ResultUtil {
     public ResponseEntity<Object> registerUser(@RequestBody UserDto userDto){
         try {
             userService.editUser(userDto);
-            return success(true, "注册成功");
+            return success("注册成功");
         } catch (BadRequestException e) {
             e.printStackTrace();
-            return fail(false, e.getMsg());
+            return fail(e.getMsg());
         }
     }
     
@@ -132,14 +132,14 @@ public class LoginController extends ResultUtil {
                     List<String> roles = getRolesByUserId(user.getId());
                     //  重新获取token
                     String token = JwtUtil.generateToken(user.getId().toString(), user.getUsername(), roles, false);
-                    return success(true, token);
+                    return success(token);
                 }
             }
         } catch (BadRequestException e) {
             e.printStackTrace();
-            return fail(false, e.getMsg());
+            return fail(e.getMsg());
         }
-        return fail(false, "请重新登录");
+        return fail("请重新登录");
     }
 
     /**
@@ -171,7 +171,7 @@ public class LoginController extends ResultUtil {
             return ResponseEntity.ok(imgResult);
         } catch (Exception e) {
             e.printStackTrace();
-            return fail(false, e.getMessage());
+            return fail(e.getMessage());
         }
     }
 

@@ -37,10 +37,10 @@ public class SysUserController extends ResultUtil {
     @GetMapping("/user/table")
     public ResponseEntity<Object> queryUserTable(QueryDto queryDto){
         try {
-            return success(true, userService.queryUserTable(queryDto));
+            return success(userService.queryUserTable(queryDto));
         } catch (BadRequestException e) {
             e.printStackTrace();
-            return fail(false, e.getMsg());
+            return fail(e.getMsg());
         }
     }
 
@@ -57,10 +57,10 @@ public class SysUserController extends ResultUtil {
         try {
             String str = StringUtil.getEditType(userDto.getId());
             userService.editUser(userDto);
-            return success(true, str);
+            return success(str);
         } catch (BadRequestException e) {
             e.printStackTrace();
-            return fail(false, e.getMsg());
+            return fail(e.getMsg());
         }
     }
 
@@ -76,10 +76,10 @@ public class SysUserController extends ResultUtil {
     public ResponseEntity<Object> delUser(String id){
         try {
             userService.delUser(id);
-            return success(true, "删除成功");
+            return success("删除成功");
         } catch (BadRequestException e) {
             e.printStackTrace();
-            return fail(false, "删除失败");
+            return fail("删除失败");
         }
     }
 
@@ -96,10 +96,10 @@ public class SysUserController extends ResultUtil {
         String str = sysUser.getEnabled() ? "启用" : "停用";
         try {
             userService.enabledUser(sysUser);
-            return success(true, str + "成功");
+            return success(str + "成功");
         } catch (BadRequestException e) {
             e.printStackTrace();
-            return fail(false, e.getMsg());
+            return fail(e.getMsg());
         }
     }
 
@@ -115,10 +115,10 @@ public class SysUserController extends ResultUtil {
     public ResponseEntity<Object> updatePassword(@RequestBody JSONObject jsonObject){
         try {
             userService.updatePassword(jsonObject);
-            return success(true, "修改成功");
+            return success("修改成功");
         } catch (BadRequestException e) {
             e.printStackTrace();
-            return fail(false, e.getMsg());
+            return fail(e.getMsg());
         }
     }
 }
